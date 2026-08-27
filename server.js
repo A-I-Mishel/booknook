@@ -135,6 +135,8 @@ app.post('/register', async (req, res, next) => {
 
 app.get('/api/auth/logout', (req, res) => { req.session = null; res.redirect('/login'); });
 
+app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 app.get('/cart', requireLogin, async (req, res, next) => {
   try {
     const cart = await getCart(req.session.userId);
