@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNook</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="logo"><h1>BookNook</h1></div>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/#featured">Featured</a></li>
+                <li><a href="/#genres">Genres</a></li>
+                <li><a href="/#bestsellers">Bestsellers</a></li>
+                <% if (userId) { %>
+                    <li><a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+                    <li><a href="/orders">My Orders</a></li>
+                    <li><a href="/profile">Account</a></li>
+                    <% if (isAdmin) { %><li><a href="/admin"><strong>Admin</strong></a></li><% } %>
+                <% } %>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <% if (userId) { %>
+                <span class="user-name"><i class="fas fa-user"></i> <%= userName %></span>
+                <a href="/api/auth/logout" class="login-btn">Logout</a>
+            <% } else { %>
+                <a href="/login" class="login-btn">Login</a>
+            <% } %>
+            <a href="/cart" class="cart-btn"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+<main>
+<section class="book-detail-section"><div class="container">
+  <a href="/" class="back-link">&larr; Back to books</a>
+  <div class="book-detail">
+    <div class="book-cover"><img src="<%= book.cover_image %>" alt="<%= book.title %>" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=600&q=80'"></div>
+    <div class="book-info-detail">
+      <h2><%= book.title %></h2>
+      <p class="author">by <%= book.author %></p>
+      <p class="genre-tag"><%= book.genre %></p>
+      <div class="rating"><% for (let i=1;i<=5;i++) { %><i class="fa fa-star <%= i <= Math.round(book.rating||0) ? 'filled' : '' %>"></i><% } %> <span>(<%= book.ratingCount||0 %> reviews)</span></div>
+      <p class="price">BDT <%= Number(book.price).toFixed(2) %></p>
+      <% if (Number(book.stock||0) > 0) { %><p class="stock in">In stock (<%= book.stock %>)</p><% } else { %><p class="stock out">Out of stock</p><% } %>
+      <% if (book.publisher) { %><p class="meta">Publisher: <%= book.publisher %> <% if (book.publishYear) { %> (<%= book.publishYear %>)<% } %></p><% } %>
+      <% if (book.isbn) { %><p class="meta">ISBN: <%= book.isbn %></p><% } %>
+      <p class="description"><%= book.description %></p>
+      <div class="actions">
+        <% if (Number(book.stock||0) > 0) { %><button class="btn-primary add-to-cart-detail" data-book-id="<%= book.book_id %>">Add to Cart</button><% } %>
+        <button class="btn-secondary wishlist-btn" data-book-id="<%= book.book_id %>"><i class="fa fa-heart"></i> <%= inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' %></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews">
+    <h3>Reviews</h3>
+    <% if (userId) { %>
+    <form id="review-form" class="review-form">
+      <input type="hidden" name="book_id" value="<%= book.book_id %>">
+      <select name="rating" required><option value="">Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Okay</option><option value="2">2 - Poor</option><option value="1">1 - Bad</option></select>
+      <textarea name="comment" placeholder="Write your review..." required></textarea>
+      <button type="submit" class="btn-primary">Submit Review</button>
+    </form>
+    <% } else { %><p><a href="/login">Login</a> to write a review.</p><% } %>
+    <div class="review-list">
+      <% if (!reviews.length) { %><p>No reviews yet.</p><% } %>
+      <% reviews.forEach((r) => { %><div class="review"><strong><%= r.userName %></strong> <span class="stars"><% for (let i=1;i<=5;i++) { %><i class="fa fa-star <%= i <= r.rating ? 'filled' : '' %>"></i><% } %></span><p><%= r.comment %></p></div><% }); %>
+    </div>
+  </div>
+</div></section></main>
+<script>
+  const bookId = '<%= book.book_id %>';
+  document.querySelector('.add-to-cart-detail')?.addEventListener('click', async (e) => {
+    if (!isLoggedIn()) { showNotification('Please login first', 'error'); window.location.href='/login'; return; }
+    const r = await fetch('/api/cart/add', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`book_id=${bookId}` });
+    const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) updateCartCount();
+  });
+  document.querySelector('.wishlist-btn')?.addEventListener('click', async (e) => {
+    if (!isLoggedIn()) { showNotification('Please login first', 'error'); window.location.href='/login'; return; }
+    const inList = '<%= inWishlist %>' === 'true';
+    const r = await fetch(inList ? '/api/wishlist/remove' : '/api/wishlist/add', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`book_id=${bookId}` });
+    const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+  });
+  document.getElementById('review-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const r = await fetch(`/api/books/${bookId}/reviews`, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(new FormData(f)) });
+    const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+  });
+</script>
+<%- include('partials/footer') %>

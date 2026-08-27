@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<main><section class="admin-section"><div class="container">
+  <a href="/admin/books" class="back-link">&larr; Back to books</a>
+  <h2><%= book ? 'Edit Book #' + book.book_id : 'Add New Book' %></h2>
+  <form id="book-form" class="auth-form">
+    <div class="form-group"><label>Title</label><input name="title" value="<%= book ? book.title : '' %>" required></div>
+    <div class="form-group"><label>Author</label><input name="author" value="<%= book ? book.author : '' %>" required></div>
+    <div class="form-group"><label>Genre</label><input name="genre" value="<%= book ? book.genre : '' %>" required></div>
+    <div class="form-group"><label>Price (BDT)</label><input name="price" type="number" step="0.01" value="<%= book ? book.price : '' %>" required></div>
+    <div class="form-group"><label>Stock</label><input name="stock" type="number" value="<%= book ? book.stock : 0 %>" required></div>
+    <div class="form-group"><label>Cover Image URL</label><input name="cover_image" value="<%= book ? book.cover_image : '' %>"></div>
+    <div class="form-group"><label>Publisher</label><input name="publisher" value="<%= book ? book.publisher : '' %>"></div>
+    <div class="form-group"><label>Publish Year</label><input name="publishYear" type="number" value="<%= book ? book.publishYear : '' %>"></div>
+    <div class="form-group"><label>ISBN</label><input name="isbn" value="<%= book ? book.isbn : '' %>"></div>
+    <div class="form-group"><label>Description</label><textarea name="description"><%= book ? book.description : '' %></textarea></div>
+    <div class="form-group"><label><input type="checkbox" name="featured" <%= book && book.featured ? 'checked' : '' %>> Featured</label></div>
+    <div class="form-group"><label><input type="checkbox" name="bestseller" <%= book && book.bestseller ? 'checked' : '' %>> Bestseller</label></div>
+    <button type="submit" class="btn-primary"><%= book ? 'Update Book' : 'Create Book' %></button>
+    <p id="form-message" class="notification error" hidden></p>
+  </form>
+</div></section></main>
+<script>
+document.getElementById('book-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const isEdit = '<%= book ? "1" : "" %>' !== '';
+  const id = '<%= book ? book.book_id : "" %>';
+  const url = isEdit ? '/api/books/' + id : '/api/books';
+  const method = isEdit ? 'PUT' : 'POST';
+  const r = await fetch(url, { method, headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(new FormData(e.target)) });
+  const d = await r.json();
+  const msg = document.getElementById('form-message');
+  if (d.success) window.location.href = '/admin/books';
+  else { msg.textContent = d.message; msg.hidden = false; }
+});
+</script>
+<%- include('../partials/footer') %>

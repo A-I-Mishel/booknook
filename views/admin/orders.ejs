@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+<main><section class="admin-section"><div class="container">
+  <h2>Manage Orders</h2>
+  <% if (!orders.length) { %><p>No orders yet.</p><% } else { %>
+  <table class="data-table">
+    <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    <% orders.forEach((o) => { %><tr><td><a href="/orders/<%= o.id %>">#<%= o.id.slice(0,8) %></a></td><td><%= o.customerName %></td><td><%= o.createdAt ? o.createdAt.toDate().toLocaleDateString() : '' %></td><td>BDT <%= Number(o.total).toFixed(2) %></td><td><span class="status <%= o.status %>"><%= o.status %></span></td><td>
+      <select class="order-status" data-order-id="<%= o.id %>"><option value="pending" <%= o.status==='pending'?'selected':'' %>>Pending</option><option value="processing" <%= o.status==='processing'?'selected':'' %>>Processing</option><option value="shipped" <%= o.status==='shipped'?'selected':'' %>>Shipped</option><option value="delivered" <%= o.status==='delivered'?'selected':'' %>>Delivered</option><option value="cancelled" <%= o.status==='cancelled'?'selected':'' %>>Cancelled</option></select>
+    </td></tr><% }); %>
+    </tbody>
+  </table><% } %>
+</div></section></main>
+<script>
+document.querySelectorAll('.order-status').forEach((sel) => sel.addEventListener('change', async () => {
+  const r = await fetch('/api/admin/orders/' + sel.dataset.orderId + '/status', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams({ status: sel.value }) });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error');
+}));
+</script>
+<%- include('../partials/footer') %>

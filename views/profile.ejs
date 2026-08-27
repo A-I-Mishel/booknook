@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+<main><section class="profile-section"><div class="container">
+  <h2>My Account</h2>
+  <div class="profile-grid">
+    <div class="profile-card">
+      <h3>Saved Addresses (<%= addresses.length %>)</h3>
+      <% if (!addresses.length) { %><p>No addresses saved.</p><% } else { %>
+      <ul class="address-list">
+        <% addresses.forEach((a) => { %><li><strong><%= a.name %></strong> <%= a.isDefault ? '<span class="badge">Default</span>' : '' %><br><%= a.line1 %>, <%= a.city %> <%= a.zip %><br><%= a.phone %><button class="btn-secondary delete-address" data-address-id="<%= a.id %>">Delete</button></li><% }); %>
+      </ul><% } %>
+      <form id="address-form" class="auth-form">
+        <h4>Add Address</h4>
+        <input name="name" placeholder="Full Name" required>
+        <input name="phone" placeholder="Phone" required>
+        <input name="line1" placeholder="Street, area" required>
+        <input name="city" placeholder="City" required>
+        <input name="zip" placeholder="ZIP/Postal">
+        <label><input type="checkbox" name="isDefault"> Set as default</label>
+        <button type="submit" class="btn-primary">Save Address</button>
+      </form>
+    </div>
+    <div class="profile-card">
+      <h3>Quick Links</h3>
+      <p><a href="/orders">My Orders (<%= wishlistCount %>)</a></p>
+      <p><a href="/wishlist">My Wishlist</a></p>
+    </div>
+  </div>
+</div></section></main>
+<script>
+document.getElementById('address-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const r = await fetch('/api/addresses', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(new FormData(e.target)) });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+});
+document.querySelectorAll('.delete-address').forEach((b) => b.addEventListener('click', async () => {
+  const r = await fetch('/api/addresses/delete', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`addressId=${b.dataset.addressId}` });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+}));
+</script>
+<%- include('partials/footer') %>

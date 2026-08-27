@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<main><section class="admin-section"><div class="container">
+  <h2>Manage Books</h2>
+  <a href="/admin/books/new" class="btn-primary">Add New Book</a>
+  <table class="data-table">
+    <thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+    <tbody>
+    <% books.forEach((b) => { %><tr><td><%= b.book_id %></td><td><%= b.title %></td><td><%= b.author %></td><td><%= b.genre %></td><td>BDT <%= Number(b.price).toFixed(2) %></td><td><%= b.stock %></td><td><a href="/admin/books/<%= b.book_id %>/edit">Edit</a> <button class="btn-secondary delete-book" data-book-id="<%= b.book_id %>">Delete</button></td></tr><% }); %>
+    </tbody>
+  </table>
+</div></section></main>
+<script>
+document.querySelectorAll('.delete-book').forEach((b) => b.addEventListener('click', async () => {
+  if (!confirm('Delete book #' + b.dataset.bookId + '?')) return;
+  const r = await fetch('/api/books/' + b.dataset.bookId, { method:'DELETE' });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+}));
+</script>
+<%- include('../partials/footer') %>

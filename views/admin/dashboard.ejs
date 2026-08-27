@@ -1,0 +1,11 @@
+<%- include('../partials/header') %>
+<main><section class="admin-section"><div class="container">
+  <h2>Admin Dashboard</h2>
+  <div class="admin-stats">
+    <div class="stat-card"><h3><%= bookCount %></h3><p>Books</p></div>
+    <div class="stat-card"><h3><%= orderCount %></h3><p>Orders</p></div>
+    <div class="stat-card"><h3>BDT <%= revenue %></h3><p>Revenue (paid)</p></div>
+  </div>
+  <p><a href="/admin/books" class="btn-primary">Manage Books</a> <a href="/admin/orders" class="btn-primary">Manage Orders</a></p>
+</div></section></main>
+<%- include('../partials/footer') %>

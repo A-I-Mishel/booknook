@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+<main><section class="orders-section"><div class="container">
+  <a href="/orders" class="back-link">&larr; My Orders</a>
+  <h2>Order #<%= order.id.slice(0,8) %></h2>
+  <p>Placed: <%= order.createdAt ? order.createdAt.toDate().toLocaleString() : '' %></p>
+  <p>Status: <span class="status <%= order.status %>"><%= order.status %></span></p>
+  <p>Customer: <%= order.customerName %> | <%= order.phone %></p>
+  <p>Delivery: <%= order.shippingAddress %></p>
+  <table class="data-table">
+    <thead><tr><th>Book</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+    <tbody>
+    <% order.items.forEach((i) => { %><tr><td><a href="/book/<%= i.bookId %>"><%= i.title %></a> <small>by <%= i.author %></small></td><td><%= i.quantity %></td><td>BDT <%= Number(i.price).toFixed(2) %></td><td>BDT <%= (Number(i.price)*i.quantity).toFixed(2) %></td></tr><% }); %>
+    </tbody>
+    <tfoot><tr><td colspan="3">Subtotal</td><td>BDT <%= Number(order.subtotal).toFixed(2) %></td></tr>
+    <tr><td colspan="3">Delivery Fee</td><td>BDT <%= Number(order.deliveryFee).toFixed(2) %></td></tr>
+    <tr><td colspan="3"><strong>Total</strong></td><td><strong>BDT <%= Number(order.total).toFixed(2) %></strong></td></tr></tfoot>
+  </table>
+  <% if (isAdmin) { %>
+  <form id="status-form" class="status-form">
+    <label>Update status:</label>
+    <select name="status"><option value="pending" <%= order.status==='pending'?'selected':'' %>>Pending</option><option value="processing" <%= order.status==='processing'?'selected':'' %>>Processing</option><option value="shipped" <%= order.status==='shipped'?'selected':'' %>>Shipped</option><option value="delivered" <%= order.status==='delivered'?'selected':'' %>>Delivered</option><option value="cancelled" <%= order.status==='cancelled'?'selected':'' %>>Cancelled</option></select>
+    <button type="submit" class="btn-primary">Update</button>
+  </form>
+  <% } %>
+</div></section></main>
+<script>
+document.getElementById('status-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const r = await fetch('/api/admin/orders/<%= order.id %>/status', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(new FormData(e.target)) });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+});
+</script>
+<%- include('partials/footer') %>

@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+<main><section class="auth-section"><div class="container"><div class="auth-form"><h2>Checkout</h2>
+<div class="summary-details"><p>Subtotal <span>BDT <%= subtotal.toFixed(2) %></span></p><p>Delivery Fee <span>BDT <%= deliveryFee.toFixed(2) %></span></p><p>Total <span>BDT <%= (subtotal + deliveryFee).toFixed(2) %></span></p></div>
+<% if (!items.length) { %><p>Your cart is empty.</p><a href="/" class="btn-primary">Continue Shopping</a><% } else { %>
+<div class="demo-banner">Demo mode — no real payment is processed. Your order will be placed as "paid".</div>
+<form id="payment-form">
+  <% if (defaultAddress) { %>
+    <div class="form-group"><label>Saved address</label>
+      <select id="addressId" name="addressId">
+        <option value="<%= defaultAddress.id %>"><%= defaultAddress.line1 %>, <%= defaultAddress.city %></option>
+        <option value="">Use a different address</option>
+      </select>
+    </div>
+  <% } %>
+  <div class="form-group"><label for="name">Full Name</label><input id="name" name="name" value="<%= defaultAddress ? defaultAddress.name : '' %>" required></div>
+  <div class="form-group"><label for="phone">Phone</label><input id="phone" name="phone" value="<%= defaultAddress ? defaultAddress.phone : '' %>" required></div>
+  <div class="form-group"><label for="address">Delivery Address</label><input id="address" name="address" placeholder="Street, area, city" <%= defaultAddress ? 'disabled' : '' %> required></div>
+  <button type="submit" class="btn-primary">Place Order</button>
+  <p id="payment-message" class="notification error" hidden></p>
+</form>
+<% } %></div></div></section></main>
+<script>const addrSelect = document.getElementById('addressId');
+if (addrSelect) {
+  const addrInput = document.getElementById('address');
+  addrSelect.addEventListener('change', () => { addrInput.disabled = !!addrSelect.value; });
+}
+document.getElementById('payment-form')?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const addressId = form.addressId ? form.addressId.value : '';
+  if (addressId && form.address) form.address.disabled = false;
+  const message = document.getElementById('payment-message');
+  const response = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)) });
+  const data = await response.json();
+  if (data.success) { window.location.href = '/orders/' + data.orderId; }
+  else { message.textContent = data.message; message.hidden = false; }
+});</script>
+<%- include('partials/footer') %>

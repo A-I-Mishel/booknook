@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+<main><section class="cart-section"><div class="container"><h2>Your Wishlist</h2>
+<% if (!books.length) { %><p>Your wishlist is empty. <a href="/">Browse books</a>.</p><% } else { %>
+<div class="books-grid" id="wishlist-books">
+<% books.forEach((book) => { %><div class="book-card" data-id="<%= book.book_id %>"><img src="<%= book.cover_image %>" alt="<%= book.title %>" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=600&q=80'"><div class="book-info"><h3><a href="/book/<%= book.book_id %>"><%= book.title %></a></h3><p class="author">by <%= book.author %></p><p class="price">BDT <%= Number(book.price).toFixed(2) %></p><button class="btn-primary add-to-cart" data-book-id="<%= book.book_id %>">Add to Cart</button> <button class="btn-secondary remove-wishlist" data-book-id="<%= book.book_id %>">Remove</button></div></div><% }); %>
+</div><% } %></div></section></main>
+<script>
+document.querySelectorAll('.add-to-cart').forEach((b) => b.addEventListener('click', () => addToCart(Number(b.dataset.bookId))));
+document.querySelectorAll('.remove-wishlist').forEach((b) => b.addEventListener('click', async () => {
+  const r = await fetch('/api/wishlist/remove', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`book_id=${b.dataset.bookId}` });
+  const d = await r.json(); showNotification(d.message, d.success?'success':'error'); if (d.success) location.reload();
+}));
+</script>
+<%- include('partials/footer') %>

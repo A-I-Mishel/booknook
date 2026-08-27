@@ -1,0 +1,10 @@
+<%- include('partials/header') %>
+<main><section class="orders-section"><div class="container"><h2>My Orders</h2>
+<% if (!orders.length) { %><p>You have no orders yet. <a href="/">Start shopping</a>.</p><% } else { %>
+<table class="data-table">
+  <thead><tr><th>Order</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  <% orders.forEach((o) => { %><tr><td>#<%= o.id.slice(0,8) %></td><td><%= o.createdAt ? new Date(o.createdAt._seconds*1000).toLocaleDateString() : '' %></td><td>BDT <%= Number(o.total).toFixed(2) %></td><td><span class="status <%= o.status %>"><%= o.status %></span></td><td><a href="/orders/<%= o.id %>">View</a></td></tr><% }); %>
+  </tbody>
+</table><% } %></div></section></main>
+<%- include('partials/footer') %>

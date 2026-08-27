@@ -1,0 +1,8 @@
+<%- include('partials/header') %>
+<main>
+    <section class="hero"><div class="container"><h2>Discover Your Next Favorite Book</h2><p>Thousands of books at your fingertips</p><div class="search-bar"><input type="text" id="search-input" placeholder="Search books or authors..."><button id="search-button"><i class="fas fa-search"></i></button></div></div></section>
+    <section id="featured" class="featured-books"><div class="container"><h2>Featured Books</h2><div class="books-grid" id="featured-books"></div></div></section>
+    <section id="genres" class="genres"><div class="container"><h2>Browse by Genre</h2><div class="genre-tags"><button class="genre-tag active" data-genre="all">All</button><% genres.forEach((genre) => { %><button class="genre-tag" data-genre="<%= genre %>"><%= genre %></button><% }); %></div><div class="books-grid" id="all-books"></div></div></section>
+    <section id="bestsellers" class="bestsellers"><div class="container"><h2>Bestsellers</h2><div class="books-grid" id="bestseller-books"></div></div></section>
+</main>
+<%- include('partials/footer') %>
