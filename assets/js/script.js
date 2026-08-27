@@ -105,30 +105,7 @@ function displayBooks(books, containerId) {
  */
 function searchBooks() {
     const query = document.getElementById('search-input').value.trim();
-    const container = document.getElementById('all-books');
-    
-    if (!query) {
-        loadBooks('all', 'all-books');
-        return;
-    }
-    
-    showLoading('all-books');
-    
-    fetch(`/api/books/search?q=${encodeURIComponent(query)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(books => {
-            displayBooks(books, 'all-books');
-        })
-        .catch(error => {
-            console.error('Error searching books:', error);
-            showError('all-books', 'Error searching books. Please try again.');
-            showNotification('Error searching books. Please try again.', 'error');
-        });
+    window.location.href = '/search?q=' + encodeURIComponent(query);
 }
 
 /**

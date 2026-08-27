@@ -26,6 +26,10 @@
             </ul>
         </nav>
         <div class="user-actions">
+            <form class="header-search" action="/search" method="get">
+                <input type="text" name="q" placeholder="Search books..." aria-label="Search books">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
             <% if (userId) { %>
                 <span class="user-name"><i class="fas fa-user"></i> <%= userName %></span>
                 <a href="/api/auth/logout" class="login-btn">Logout</a>

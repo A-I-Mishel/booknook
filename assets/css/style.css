@@ -837,3 +837,12 @@ footer {
 .badge { background:#3498db; color:#fff; padding:2px 8px; border-radius:10px; font-size:12px; }
 .user-name { color:#fff; margin-right:10px; }
 .auth-form input[type=checkbox] { width:auto; margin-right:6px; }
+
+/* Header search + search page */
+.header-search { display:flex; align-items:center; margin-right:12px; }
+.header-search input { padding:6px 10px; border:1px solid #ddd; border-radius:4px 0 0 4px; outline:none; width:150px; font-size:13px; }
+.header-search button { padding:6px 10px; border:1px solid #2c3e50; border-left:none; background:#2c3e50; color:#fff; border-radius:0 4px 4px 0; cursor:pointer; }
+.search-bar-page { max-width:520px; margin:10px 0 25px; display:flex; }
+.search-bar-page input { flex:1; padding:12px 15px; border:1px solid #ddd; border-radius:4px 0 0 4px; font-size:15px; }
+.search-bar-page button { padding:0 18px; border:1px solid #2c3e50; border-left:none; background:#2c3e50; color:#fff; border-radius:0 4px 4px 0; cursor:pointer; font-size:16px; }
+.search-page .books-grid { margin-top:10px; }

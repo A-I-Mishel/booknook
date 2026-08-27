@@ -90,6 +90,15 @@ app.get('/', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+app.get('/search', async (req, res, next) => {
+  try {
+    const q = String(req.query.q || '').trim();
+    const genresSnap = await db.collection('genres').get();
+    const genres = genresSnap.docs.map((d) => d.data().genre_name);
+    res.render('search', { q, genres });
+  } catch (error) { next(error); }
+});
+
 app.get('/login', (req, res) => res.render('login', { error: null }));
 app.post('/login', async (req, res, next) => {
   const email = String(req.body.email || '').trim();
@@ -300,7 +309,13 @@ app.get('/api/books/search', async (req, res, next) => {
     const snap = await db.collection('books').get();
     const books = snap.docs
       .map((d) => ({ book_id: Number(d.id), ...d.data(), price: Number(d.data().price) }))
-      .filter((b) => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query) || (b.genre || '').toLowerCase().includes(query));
+      .filter((b) =>
+        (b.title || '').toLowerCase().includes(query) ||
+        (b.author || '').toLowerCase().includes(query) ||
+        (b.genre || '').toLowerCase().includes(query) ||
+        (b.description || '').toLowerCase().includes(query) ||
+        (b.isbn || '').toLowerCase().includes(query)
+      );
     res.json(books);
   } catch (error) { next(error); }
 });
