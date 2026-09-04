@@ -7,6 +7,10 @@ const bcrypt = require('bcryptjs');
 const { admin, db, firebaseError } = require('./firebase');
 
 const app = express();
+// Trust Vercel's edge proxy so req.secure is true on https.
+// Without this, cookie-session with secure:true silently drops
+// the session cookie in production (login/signup never stick).
+app.set('trust proxy', 1);
 const port = Number(process.env.PORT || 3000);
 const deliveryFee = 50;
 const FieldValue = admin.firestore.FieldValue;
