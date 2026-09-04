@@ -4,7 +4,7 @@ const path = require('path');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
-const { admin, db } = require('./firebase');
+const { admin, db, firebaseError } = require('./firebase');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -26,9 +26,10 @@ app.use(cookieSession({
 }));
 
 app.use(async (req, res, next) => {
-  res.locals.userId = req.session.userId || null;
+  res.locals.userId = (req.session && req.session.userId) || null;
   res.locals.isAdmin = false;
   res.locals.userName = null;
+  if (!db) return next();
   if (req.session.userId) {
     try {
       const u = await db.collection('users').doc(req.session.userId).get();
@@ -40,6 +41,31 @@ app.use(async (req, res, next) => {
     } catch (_) { /* ignore */ }
   }
   next();
+});
+
+// Health check must work even when Firestore isn't configured,
+// so Vercel / uptime checks can verify the function booted.
+app.get('/api/health', (req, res) => {
+  res.json({
+    ok: true,
+    ts: Date.now(),
+    dbReady: !!db,
+    ...(firebaseError ? { firebaseError: firebaseError.message } : {}),
+  });
+});
+
+// If Firebase failed to init, don't crash the serverless function
+// (FUNCTION_INVOCATION_FAILED). Show a friendly config error instead.
+app.use((req, res, next) => {
+  if (db) return next();
+  if (req.path === '/api/health' || req.path.startsWith('/assets')) return next();
+  const message = firebaseError
+    ? `Server misconfigured: ${firebaseError.message}`
+    : 'Server misconfigured: Firebase credentials missing.';
+  if (req.accepts('json') && !req.accepts('html')) {
+    return res.status(500).json({ success: false, error: message });
+  }
+  return res.status(500).render('error', { code: 500, message });
 });
 
 function requireLogin(req, res, next) {
@@ -143,8 +169,6 @@ app.post('/register', async (req, res, next) => {
 });
 
 app.get('/api/auth/logout', (req, res) => { req.session = null; res.redirect('/login'); });
-
-app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
 
 app.get('/cart', requireLogin, async (req, res, next) => {
   try {

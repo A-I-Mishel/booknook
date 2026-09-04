@@ -1,6 +1,11 @@
 const bcrypt = require('bcryptjs');
-const { db, admin } = require('./firebase');
+const { db, admin, firebaseError } = require('./firebase');
 const FieldValue = admin.firestore.FieldValue;
+
+if (!db) {
+  console.error('Seed failed:', firebaseError ? firebaseError.message : 'Firebase not configured');
+  process.exit(1);
+}
 
 const genres = [
   'Fiction', 'Non-Fiction', 'Mystery', 'Romance',
